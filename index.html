@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nimbus Weather | Modern Responsive Forecast</title>
+    <meta name="description" content="A modern, interactive, and responsive weather forecast web application built with Tailwind CSS and Open-Meteo." />
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body class="min-h-screen weather-bg-clear-day text-white transition-colors duration-700 antialiased selection:bg-white/20 selection:text-white relative overflow-x-hidden">
+    <!-- Atmospheric Background Overlay -->
+    <div id="weather-effect-container" class="pointer-events-none fixed inset-0 z-0 overflow-hidden opacity-40"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col min-h-screen">
+      <!-- Header & Navigation -->
+      <header class="flex flex-col md:flex-row items-center justify-between gap-4 pb-6 border-b border-white/10">
+        <div class="flex items-center gap-3">
+          <div class="p-2.5 rounded-2xl bg-white/15 border border-white/20 shadow-lg backdrop-blur-md">
+            <svg class="w-8 h-8 text-amber-300 animate-pulse-glow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-2xl font-black tracking-tight text-white drop-shadow-sm">Nimbus<span class="text-sky-300 font-light">Cast</span></h1>
+              <span class="text-xs px-2 py-0.5 rounded-full bg-white/20 border border-white/30 text-white/90 font-medium">Exp 1</span>
+            </div>
+            <p class="text-xs text-white/70">Interactive Real-time Weather Intelligence</p>
+          </div>
+        </div>
+
+        <!-- Search Bar with Live Suggestion Dropdown -->
+        <div class="relative w-full md:w-96">
+          <form id="search-form" class="relative">
+            <input
+              type="text"
+              id="search-input"
+              autocomplete="off"
+              placeholder="Search city (e.g., Tokyo, London, Mumbai)..."
+              class="w-full pl-11 pr-10 py-2.5 bg-white/15 hover:bg-white/20 focus:bg-white/25 border border-white/25 rounded-2xl text-white placeholder-white/60 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent transition-all shadow-inner backdrop-blur-md"
+            />
+            <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/70">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <button
+              type="button"
+              id="locate-me-btn"
+              title="Use Current Location"
+              class="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-white/70 hover:text-white hover:scale-110 transition-transform"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </button>
+          </form>
+
+          <!-- Autocomplete Dropdown -->
+          <div
+            id="suggestions-dropdown"
+            class="hidden absolute left-0 right-0 top-full mt-2 bg-slate-900/90 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden z-50 divide-y divide-white/10 transition-all duration-200"
+          ></div>
+        </div>
+
+        <!-- Controls: Unit Switcher -->
+        <div class="flex items-center gap-3">
+          <div class="bg-black/20 p-1 rounded-2xl border border-white/20 backdrop-blur-md flex items-center">
+            <button
+              id="unit-c"
+              class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-white text-slate-900 shadow-md"
+            >
+              °C
+            </button>
+            <button
+              id="unit-f"
+              class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all text-white/80 hover:text-white"
+            >
+              °F
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Quick City Selector Pills -->
+      <div class="flex items-center gap-2 py-4 overflow-x-auto no-scrollbar">
+        <span class="text-xs text-white/60 whitespace-nowrap">Trending:</span>
+        <div id="quick-cities" class="flex items-center gap-2">
+          <!-- Buttons dynamically injected via JS -->
+        </div>
+      </div>
+
+      <!-- Main Forecast Dashboard -->
+      <main class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 my-2">
+        <!-- Left Hero Section (Current Weather + Key Highlights) -->
+        <section class="lg:col-span-8 flex flex-col gap-6">
+          <!-- Main Current Weather Banner Card -->
+          <div class="glass-panel rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-2xl">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 relative z-10">
+              <div>
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 border border-white/20 text-xs font-medium backdrop-blur-md mb-2">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span id="location-country">India</span>
+                </div>
+                <h2 id="location-name" class="text-3xl sm:text-5xl font-black tracking-tight text-white">Mumbai</h2>
+                <p id="local-time" class="text-xs sm:text-sm text-white/80 mt-1 font-medium">Wednesday, Aug 19 • 08:30 PM</p>
+              </div>
+
+              <!-- Animated Icon + Current Condition -->
+              <div class="flex items-center sm:flex-col sm:items-end gap-3 sm:gap-1">
+                <div id="current-weather-icon-box" class="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center p-3 rounded-3xl bg-white/15 border border-white/20 backdrop-blur-lg shadow-lg">
+                  <!-- SVG will be injected -->
+                </div>
+                <span id="current-condition-text" class="text-lg sm:text-xl font-bold capitalize text-white">Clear sky</span>
+              </div>
+            </div>
+
+            <div class="mt-8 flex flex-col sm:flex-row sm:items-baseline justify-between gap-6 relative z-10">
+              <div class="flex items-baseline">
+                <span id="current-temp" class="text-6xl sm:text-8xl font-black tracking-tighter text-white drop-shadow-md">28</span>
+                <span id="temp-unit-symbol" class="text-3xl sm:text-4xl font-bold ml-1 text-white/90">°C</span>
+              </div>
+
+              <div class="flex items-center gap-4 text-sm sm:text-base font-semibold text-white/90 bg-white/10 px-4 py-2 rounded-2xl border border-white/15 backdrop-blur-md">
+                <div>
+                  <span class="text-white/60 text-xs block">Feels Like</span>
+                  <span id="current-apparent-temp">31°C</span>
+                </div>
+                <div class="h-6 w-px bg-white/20"></div>
+                <div>
+                  <span class="text-white/60 text-xs block">High / Low</span>
+                  <span id="current-high-low">32° / 26°</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Weather Metrics Grid (Wind, Humidity, Pressure, UV, Sunrise, Sunset) -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <!-- Wind -->
+            <div class="glass-card rounded-2xl p-4 flex flex-col justify-between">
+              <div class="flex items-center justify-between text-white/70 mb-2">
+                <span class="text-xs uppercase tracking-wider font-semibold">Wind</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </div>
+              <div>
+                <div class="text-xl sm:text-2xl font-black text-white" id="metric-wind">14 km/h</div>
+                <div class="text-xs text-white/70 mt-1 flex items-center gap-1">
+                  <span id="metric-wind-dir">SW</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Humidity -->
+            <div class="glass-card rounded-2xl p-4 flex flex-col justify-between">
+              <div class="flex items-center justify-between text-white/70 mb-2">
+                <span class="text-xs uppercase tracking-wider font-semibold">Humidity</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+              </div>
+              <div>
+                <div class="text-xl sm:text-2xl font-black text-white" id="metric-humidity">78%</div>
+                <div class="text-xs text-white/70 mt-1">Dew point normal</div>
+              </div>
+            </div>
+
+            <!-- UV Index -->
+            <div class="glass-card rounded-2xl p-4 flex flex-col justify-between">
+              <div class="flex items-center justify-between text-white/70 mb-2">
+                <span class="text-xs uppercase tracking-wider font-semibold">UV Index</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3"/></svg>
+              </div>
+              <div>
+                <div class="text-xl sm:text-2xl font-black text-white" id="metric-uv">6 <span class="text-xs font-normal text-amber-300">Mod</span></div>
+                <div class="text-xs text-white/70 mt-1">Sun protection advised</div>
+              </div>
+            </div>
+
+            <!-- Pressure -->
+            <div class="glass-card rounded-2xl p-4 flex flex-col justify-between">
+              <div class="flex items-center justify-between text-white/70 mb-2">
+                <span class="text-xs uppercase tracking-wider font-semibold">Pressure</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              </div>
+              <div>
+                <div class="text-xl sm:text-2xl font-black text-white" id="metric-pressure">1012 hPa</div>
+                <div class="text-xs text-white/70 mt-1">Stable</div>
+              </div>
+            </div>
+
+            <!-- Sunrise -->
+            <div class="glass-card rounded-2xl p-4 flex flex-col justify-between">
+              <div class="flex items-center justify-between text-white/70 mb-2">
+                <span class="text-xs uppercase tracking-wider font-semibold">Sunrise</span>
+                <svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+              </div>
+              <div>
+                <div class="text-xl sm:text-2xl font-black text-white" id="metric-sunrise">06:12 AM</div>
+                <div class="text-xs text-white/70 mt-1">Dawn glow</div>
+              </div>
+            </div>
+
+            <!-- Sunset -->
+            <div class="glass-card rounded-2xl p-4 flex flex-col justify-between">
+              <div class="flex items-center justify-between text-white/70 mb-2">
+                <span class="text-xs uppercase tracking-wider font-semibold">Sunset</span>
+                <svg class="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </div>
+              <div>
+                <div class="text-xl sm:text-2xl font-black text-white" id="metric-sunset">07:05 PM</div>
+                <div class="text-xs text-white/70 mt-1">Dusk</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 24-Hour Forecast Carousel -->
+          <div class="glass-panel rounded-3xl p-5 shadow-xl">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <svg class="w-4 h-4 text-sky-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Hourly Forecast
+              </h3>
+              <span class="text-xs text-white/60 font-medium">Next 24 Hours</span>
+            </div>
+            <div id="hourly-forecast-track" class="flex gap-3 overflow-x-auto pb-2 pt-1 no-scrollbar scroll-smooth">
+              <!-- Hourly Cards injected dynamically -->
+            </div>
+          </div>
+        </section>
+
+        <!-- Right Side: 7-Day Forecast & Weather Advisory -->
+        <section class="lg:col-span-4 flex flex-col gap-6">
+          <!-- 7-Day Forecast List -->
+          <div class="glass-panel rounded-3xl p-6 shadow-2xl flex flex-col h-full">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                <svg class="w-5 h-5 text-sky-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                7-Day Forecast
+              </h3>
+            </div>
+
+            <div id="daily-forecast-container" class="flex flex-col gap-2.5 divide-y divide-white/10">
+              <!-- Daily forecast rows injected dynamically -->
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- Footer Info -->
+      <footer class="mt-8 pt-4 border-t border-white/10 text-center text-xs text-white/60 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <p>Full Stack Experiment 1: Responsive & Interactive UI with Tailwind CSS</p>
+        <p>Powered by Open-Meteo API • Zero Config Required</p>
+      </footer>
+    </div>
+
+    <!-- Main Javascript Entrypoint -->
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
