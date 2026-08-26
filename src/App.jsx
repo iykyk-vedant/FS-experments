@@ -9,20 +9,28 @@ import { useWeather } from './hooks/useWeather';
  * Main App: Experiment 2 (React Hooks, Forms, Data Fetching, Reusable Custom Hook)
  */
 export default function App() {
-  // Navigation state between pages
   const [activeTab, setActiveTab] = useState('home');
+  const [unit, setUnit] = useState('C');
 
-  // Reusable custom hook for weather data
+  // Reusable custom hook for weather data fetching & state management
   const weatherProps = useWeather('Mumbai');
 
+  const currentBg = weatherProps.weather?.bg || 'clear-day';
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-4xl mx-auto flex flex-col min-h-[90vh]">
+    <div className={`min-h-screen weather-bg-${currentBg} text-white transition-colors duration-700 antialiased selection:bg-white/20 selection:text-white relative overflow-x-hidden`}>
+      {/* Container */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col min-h-screen">
         {/* Navigation Bar */}
-        <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
+        <Navbar
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          unit={unit}
+          setUnit={setUnit}
+        />
 
         {/* Dynamic Page Views */}
-        <main className="flex-1">
+        <main className="flex-1 flex flex-col">
           {activeTab === 'home' && (
             <Home setActiveTab={setActiveTab} />
           )}
@@ -32,13 +40,17 @@ export default function App() {
           )}
 
           {activeTab === 'dashboard' && (
-            <Dashboard {...weatherProps} />
+            <Dashboard
+              {...weatherProps}
+              unit={unit}
+            />
           )}
         </main>
 
         {/* Footer */}
-        <footer className="py-4 text-center text-xs text-slate-500 border-t border-slate-900 mt-8">
-          Weather Dashboard • Built with React 19 & Tailwind CSS
+        <footer className="mt-8 pt-4 border-t border-white/10 text-center text-xs text-white/60 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <p>Experiment 2: React Hooks (Forms, Data Fetching & Reusable Custom Hooks)</p>
+          <p>Powered by Open-Meteo API</p>
         </footer>
       </div>
     </div>
