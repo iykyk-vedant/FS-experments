@@ -1,87 +1,46 @@
 import React, { useState } from 'react';
+import { Navbar } from './components/Navbar';
+import { Home } from './components/Home';
+import { Login } from './components/Login';
+import { Dashboard } from './components/Dashboard';
 import { useWeather } from './hooks/useWeather';
-import { WeatherForm } from './components/WeatherForm';
-import { WeatherCard } from './components/WeatherCard';
-import { ForecastCard } from './components/ForecastCard';
-import './App.css';
 
 /**
- * Main App Component
- * 
- * Uses:
- * 1. Custom hook (useWeather) for data fetching and state management
- * 2. useState for local temperature unit toggle (Celsius / Fahrenheit)
- * 3. Controlled form and modular display components
+ * Main App: Experiment 2 (React Hooks, Forms, Data Fetching, Reusable Custom Hook)
  */
 export default function App() {
-  // Local state to toggle temperature unit between Celsius and Fahrenheit
-  const [unit, setUnit] = useState('C');
+  // Navigation state between pages
+  const [activeTab, setActiveTab] = useState('home');
 
-  // Using our Reusable Custom Hook (useWeather)
-  const {
-    weather,
-    forecast,
-    cityInfo,
-    loading,
-    error,
-    fetchWeather
-  } = useWeather('Mumbai');
+  // Reusable custom hook for weather data
+  const weatherProps = useWeather('Mumbai');
 
   return (
-    <div className="app-container">
-      {/* Header Section */}
-      <header className="app-header">
-        <h1 className="app-title">🌦️ Weather Dashboard</h1>
-        <p className="app-subtitle">
-          Real-time weather forecast & 5-day outlook
-        </p>
-      </header>
+    <div className="min-h-screen bg-slate-950 text-slate-100 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-4xl mx-auto flex flex-col min-h-[90vh]">
+        {/* Navigation Bar */}
+        <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      {/* Main Content */}
-      <main className="app-main">
-        {/* Search & Controls Form */}
-        <WeatherForm
-          onSearch={fetchWeather}
-          unit={unit}
-          onToggleUnit={setUnit}
-          loading={loading}
-        />
+        {/* Dynamic Page Views */}
+        <main className="flex-1">
+          {activeTab === 'home' && (
+            <Home setActiveTab={setActiveTab} />
+          )}
 
-        {/* Loading Indicator */}
-        {loading && (
-          <div className="status-box loading-box">
-            <div className="spinner"></div>
-            <p>Fetching latest weather data...</p>
-          </div>
-        )}
+          {activeTab === 'login' && (
+            <Login onLoginSuccess={() => setActiveTab('dashboard')} />
+          )}
 
-        {/* Error Message Box */}
-        {error && !loading && (
-          <div className="status-box error-box">
-            <p><strong>Error:</strong> {error}</p>
-          </div>
-        )}
+          {activeTab === 'dashboard' && (
+            <Dashboard {...weatherProps} />
+          )}
+        </main>
 
-        {/* Weather Results */}
-        {!loading && weather && (
-          <>
-            <WeatherCard
-              weather={weather}
-              cityInfo={cityInfo}
-              unit={unit}
-            />
-            <ForecastCard
-              forecast={forecast}
-              unit={unit}
-            />
-          </>
-        )}
-      </main>
-
-      {/* Footer */}
-      <footer className="app-footer">
-        <p>Weather Dashboard • Powered by Open-Meteo API</p>
-      </footer>
+        {/* Footer */}
+        <footer className="py-4 text-center text-xs text-slate-500 border-t border-slate-900 mt-8">
+          Weather Dashboard • Built with React 19 & Tailwind CSS
+        </footer>
+      </div>
     </div>
   );
 }
