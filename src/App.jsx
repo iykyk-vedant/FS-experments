@@ -3,16 +3,15 @@ import { useWeather } from './hooks/useWeather';
 import { WeatherForm } from './components/WeatherForm';
 import { WeatherCard } from './components/WeatherCard';
 import { ForecastCard } from './components/ForecastCard';
-import { HooksGuide } from './components/HooksGuide';
 import './App.css';
 
 /**
- * Main App Component for Experiment 2
+ * Main App Component
  * 
- * Demonstrates:
- * 1. Calling the reusable custom hook (useWeather)
- * 2. Managing component state with useState (unit toggle: C or F)
- * 3. Conditional rendering based on loading and error states
+ * Uses:
+ * 1. Custom hook (useWeather) for data fetching and state management
+ * 2. useState for local temperature unit toggle (Celsius / Fahrenheit)
+ * 3. Controlled form and modular display components
  */
 export default function App() {
   // Local state to toggle temperature unit between Celsius and Fahrenheit
@@ -32,9 +31,9 @@ export default function App() {
     <div className="app-container">
       {/* Header Section */}
       <header className="app-header">
-        <h1 className="app-title">🌦️ React Weather Dashboard</h1>
+        <h1 className="app-title">🌦️ Weather Dashboard</h1>
         <p className="app-subtitle">
-          Experiment 2: React Hooks (Forms, Data Fetching & Reusable Custom Hooks)
+          Real-time weather forecast & 5-day outlook
         </p>
       </header>
 
@@ -77,14 +76,11 @@ export default function App() {
             />
           </>
         )}
-
-        {/* Educational Reference Guide */}
-        <HooksGuide />
       </main>
 
       {/* Footer */}
       <footer className="app-footer">
-        <p>Full Stack Experiment 2 • Built with React 19 & Open-Meteo API</p>
+        <p>Weather Dashboard • Powered by Open-Meteo API</p>
       </footer>
     </div>
   );
