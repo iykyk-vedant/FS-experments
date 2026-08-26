@@ -280,6 +280,7 @@ function selectLocation(loc) {
 
 // Event Listeners Setup
 function initApp() {
+  setupNavigation();
   renderTrendingCities();
   loadWeather(state.currentLocation);
 
@@ -380,7 +381,7 @@ function initApp() {
   });
 
   // Geolocation button
-  document.getElementById('locate-me-btn').addEventListener('click', () => {
+  document.getElementById('locate-me-btn')?.addEventListener('click', () => {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
@@ -402,5 +403,66 @@ function initApp() {
   });
 }
 
+function setupNavigation() {
+  const views = {
+    home: document.getElementById('view-home'),
+    login: document.getElementById('view-login'),
+    dashboard: document.getElementById('view-dashboard')
+  };
+
+  const navBtns = {
+    home: document.getElementById('nav-btn-home'),
+    login: document.getElementById('nav-btn-login'),
+    dashboard: document.getElementById('nav-btn-dashboard')
+  };
+
+  function switchView(targetView) {
+    // Toggle active views
+    Object.keys(views).forEach(key => {
+      if (views[key]) {
+        if (key === targetView) {
+          views[key].classList.remove('hidden');
+        } else {
+          views[key].classList.add('hidden');
+        }
+      }
+    });
+
+    // Toggle nav button active styles
+    Object.keys(navBtns).forEach(key => {
+      if (navBtns[key]) {
+        if (key === targetView) {
+          navBtns[key].className = 'px-4 py-2 rounded-xl text-sm font-bold transition-all bg-white text-slate-900 shadow-md';
+        } else {
+          navBtns[key].className = 'px-4 py-2 rounded-xl text-sm font-semibold transition-all text-white/80 hover:text-white';
+        }
+      }
+    });
+  }
+
+  // Nav button listeners
+  navBtns.home?.addEventListener('click', () => switchView('home'));
+  navBtns.dashboard?.addEventListener('click', () => switchView('dashboard'));
+  navBtns.login?.addEventListener('click', () => switchView('login'));
+  document.getElementById('brand-logo')?.addEventListener('click', () => switchView('dashboard'));
+
+  // Home CTA listeners
+  document.getElementById('home-cta-dashboard')?.addEventListener('click', () => switchView('dashboard'));
+  document.getElementById('home-cta-login')?.addEventListener('click', () => switchView('login'));
+
+  // Login form handler
+  document.getElementById('login-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    alert('Logged in successfully! Redirecting to Dashboard...');
+    switchView('dashboard');
+  });
+
+  document.getElementById('login-switch-signup')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    alert('Registration form will be connected in future backend experiment.');
+  });
+}
+
 // Start app
 initApp();
+
