@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, createContext, useContext } from 'react';
 
 // Weather code to condition text helper
 const getWeatherDesc = (code) => {
@@ -72,3 +72,9 @@ export function useWeather(defaultCity = 'Mumbai') {
 
   return { weather, forecast, cityInfo, loading, error, fetchWeather };
 }
+
+// 1. Create Context for global weather state
+export const WeatherContext = createContext(null);
+
+// 2. Custom hook to consume WeatherContext easily
+export const useWeatherContext = () => useContext(WeatherContext);
