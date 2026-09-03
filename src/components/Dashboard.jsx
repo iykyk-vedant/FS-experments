@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
+import { useWeatherContext } from '../hooks/useWeather';
 
 /**
  * Dashboard Component: Search form, unit toggle, and weather forecast display
+ * Consumes global weather state via useWeatherContext() (useContext hook)
  */
-export function Dashboard({ weather, forecast, cityInfo, loading, error, fetchWeather }) {
+export function Dashboard() {
+  const { weather, forecast, cityInfo, loading, error, fetchWeather } = useWeatherContext();
   const [searchInput, setSearchInput] = useState('');
   const [unit, setUnit] = useState('C');
 
