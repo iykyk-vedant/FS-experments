@@ -6,7 +6,7 @@ import { Dashboard } from './components/Dashboard';
 import { useWeather, WeatherContext } from './hooks/useWeather';
 
 /**
- * Main App: Experiment 3 (React useContext Hook & Global Context State)
+ * Main App: Experiment 2 (React Hooks, Forms, Data Fetching, useContext & Custom Hooks)
  */
 export default function App() {
   // Navigation state between pages
