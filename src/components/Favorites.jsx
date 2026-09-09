@@ -3,9 +3,10 @@ import { AppContext } from '../context/AppContext';
 
 /**
  * Favorites Component: Consumes global favorites state and removeFavorite action
+ * Connected to MongoDB backend REST API via AppContext
  */
 export function Favorites({ onSelectCity }) {
-  const { favorites, removeFavorite } = useContext(AppContext);
+  const { favorites, removeFavorite, backendConnected } = useContext(AppContext);
 
   return (
     <div className="py-6 max-w-xl mx-auto">
@@ -13,6 +14,16 @@ export function Favorites({ onSelectCity }) {
         <h2 className="text-2xl font-black text-white">
           ⭐ Saved Cities ({favorites.length})
         </h2>
+        <span
+          className={`px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 border ${
+            backendConnected
+              ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+              : 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+          }`}
+        >
+          <span className={`w-2 h-2 rounded-full ${backendConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
+          {backendConnected ? 'MongoDB Live' : 'Local Mode'}
+        </span>
       </div>
 
       {favorites.length === 0 ? (
@@ -20,7 +31,7 @@ export function Favorites({ onSelectCity }) {
           <span className="text-4xl">📍</span>
           <p className="text-slate-300 font-semibold mt-3 text-sm">No saved cities yet</p>
           <p className="text-xs text-slate-500 mt-1">
-            Search for a city in the Dashboard and click "Add to Favorites" to save it here.
+            Search for a city in the Dashboard and click "Add to Favorites" to persist it in MongoDB.
           </p>
         </div>
       ) : (
