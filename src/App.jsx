@@ -3,10 +3,11 @@ import { Navbar } from './components/Navbar';
 import { Home } from './components/Home';
 import { Login } from './components/Login';
 import { Dashboard } from './components/Dashboard';
+import { Favorites } from './components/Favorites';
 import { useWeather, WeatherContext } from './hooks/useWeather';
 
 /**
- * Main App: Experiment 2 (React Hooks, Forms, Data Fetching, useContext & Custom Hooks)
+ * Main App: Experiment 2 + Experiment 3 (React Hooks & Context API Global State)
  */
 export default function App() {
   // Navigation state between pages
@@ -34,6 +35,15 @@ export default function App() {
 
             {activeTab === 'dashboard' && (
               <Dashboard />
+            )}
+
+            {activeTab === 'favorites' && (
+              <Favorites
+                onSelectCity={(city) => {
+                  weatherProps.fetchWeather(city);
+                  setActiveTab('dashboard');
+                }}
+              />
             )}
           </main>
 

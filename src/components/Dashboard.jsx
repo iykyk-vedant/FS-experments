@@ -1,14 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useWeatherContext } from '../hooks/useWeather';
+import { AppContext } from '../context/AppContext';
 
 /**
  * Dashboard Component: Search form, unit toggle, and weather forecast display
  * Consumes global weather state via useWeatherContext() (useContext hook)
+ * Consumes global favorites state & actions via AppContext
  */
 export function Dashboard() {
   const { weather, forecast, cityInfo, loading, error, fetchWeather } = useWeatherContext();
+  const { favorites, addFavorite, removeFavorite } = useContext(AppContext);
   const [searchInput, setSearchInput] = useState('');
   const [unit, setUnit] = useState('C');
+
+  const isFav = favorites.some((f) => f.name.toLowerCase() === cityInfo.name?.toLowerCase());
 
   const popularCities = ['Mumbai', 'Delhi', 'London', 'Tokyo', 'New York', 'Paris'];
 
@@ -96,9 +101,30 @@ export function Dashboard() {
           <div className="bg-slate-800/80 p-6 sm:p-8 rounded-3xl border border-slate-700 shadow-xl">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <span className="px-3 py-1 bg-slate-700 text-slate-300 rounded-full text-xs font-medium">
-                  📍 {cityInfo.country || 'Location'}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1 bg-slate-700 text-slate-300 rounded-full text-xs font-medium">
+                    📍 {cityInfo.country || 'Location'}
+                  </span>
+                  <button
+                    onClick={() =>
+                      isFav
+                        ? removeFavorite(favorites.find((f) => f.name.toLowerCase() === cityInfo.name.toLowerCase())?.id)
+                        : addFavorite({
+                            name: cityInfo.name,
+                            country: cityInfo.country,
+                            temp: weather.temperature,
+                            condition: weather.condition
+                          })
+                    }
+                    className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer border ${
+                      isFav
+                        ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30'
+                        : 'bg-slate-700/60 text-slate-300 border-slate-600 hover:text-white hover:bg-slate-700'
+                    }`}
+                  >
+                    {isFav ? '★ Saved' : '☆ Add to Favorites'}
+                  </button>
+                </div>
                 <h2 className="text-3xl sm:text-4xl font-black text-white mt-2">{cityInfo.name}</h2>
                 <p className="text-xs text-slate-400 mt-1">Updated at {weather.time}</p>
               </div>

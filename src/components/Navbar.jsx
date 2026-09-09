@@ -1,12 +1,16 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { AppContext } from '../context/AppContext';
 
 /**
- * Navbar Component: Navigation between Home, Dashboard, and Login
+ * Navbar Component: Navigation between Home, Dashboard, Favorites, and Login
  */
 export function Navbar({ activeTab, setActiveTab }) {
+  const { favorites } = useContext(AppContext);
+
   const navItems = [
     { id: 'home', label: '🏠 Home' },
     { id: 'dashboard', label: '📊 Dashboard' },
+    { id: 'favorites', label: `⭐ Favorites (${favorites.length})` },
     { id: 'login', label: '🔐 Login' }
   ];
 
