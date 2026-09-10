@@ -1,6 +1,6 @@
 /**
- * Automated Verification Script for Experiment 4 CRUD APIs
- * Tests all 5 REST operations for both Weather and Product resources.
+ * Automated Verification Script for Weather CRUD APIs
+ * Tests all 5 REST operations for Weather resources.
  */
 
 const http = require("http");
@@ -104,55 +104,8 @@ async function runTests() {
     console.log(`Status: ${deleteWeatherRes.status}`);
     console.log("Delete Response:", JSON.stringify(deleteWeatherRes.data, null, 2));
 
-    // ==========================================
-    // PRODUCT REST API CRUD TESTS (LAB MANUAL)
-    // ==========================================
-    console.log("\n--------------------------------------------------");
-    console.log("📦 TESTING PRODUCT REST CRUD APIs (/api/products)");
-    console.log("--------------------------------------------------");
-
-    // POST /api/products (Create)
-    console.log("\n[POST] /api/products - Creating Product 'Laptop'...");
-    const createProductRes = await request("POST", "/api/products", {
-      name: "Laptop",
-      price: 55000,
-      category: "Electronics",
-      description: "Laptop for students",
-      stock: 10
-    });
-    console.log(`Status: ${createProductRes.status}`);
-    console.log("Created Product:", JSON.stringify(createProductRes.data, null, 2));
-    const productId = createProductRes.data._id;
-
-    // GET /api/products (Get All)
-    console.log("\n[GET] /api/products - Fetching all products...");
-    const getAllProductsRes = await request("GET", "/api/products");
-    console.log(`Status: ${getAllProductsRes.status}`);
-    console.log(`Total Products: ${getAllProductsRes.data.length}`);
-
-    // GET /api/products/:id (Get By ID)
-    console.log(`\n[GET] /api/products/${productId} - Fetching product by ID...`);
-    const getOneProductRes = await request("GET", `/api/products/${productId}`);
-    console.log(`Status: ${getOneProductRes.status}`);
-    console.log("Fetched Product:", JSON.stringify(getOneProductRes.data, null, 2));
-
-    // PUT /api/products/:id (Update)
-    console.log(`\n[PUT] /api/products/${productId} - Updating price and stock...`);
-    const updateProductRes = await request("PUT", `/api/products/${productId}`, {
-      price: 50000,
-      stock: 15
-    });
-    console.log(`Status: ${updateProductRes.status}`);
-    console.log("Updated Product:", JSON.stringify(updateProductRes.data, null, 2));
-
-    // DELETE /api/products/:id (Delete)
-    console.log(`\n[DELETE] /api/products/${productId} - Deleting product...`);
-    const deleteProductRes = await request("DELETE", `/api/products/${productId}`);
-    console.log(`Status: ${deleteProductRes.status}`);
-    console.log("Delete Response:", JSON.stringify(deleteProductRes.data, null, 2));
-
     console.log("\n==================================================");
-    console.log("✅ ALL EXPERIMENT 4 REST CRUD TESTS PASSED SUCCESSFULLY!");
+    console.log("✅ ALL WEATHER REST CRUD TESTS PASSED SUCCESSFULLY!");
     console.log("==================================================");
   } catch (err) {
     console.error("❌ Test failed:", err);

@@ -4,7 +4,6 @@ const cors = require("cors");
 require("dotenv").config();
 
 const weatherRoutes = require("./routes/weatherRoutes");
-const productRoutes = require("./routes/productRoutes");
 
 const app = express();
 
@@ -13,10 +12,15 @@ app.use(cors());
 app.use(express.json());
 
 // Database Connection
-const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/FullStackProject";
+const MONGO_URI =
+  process.env.MONGO_URI ||
+  process.env.MONGODB_URI ||
+  "mongodb://127.0.0.1:27017/FullStackProject";
 
 mongoose
-  .connect(MONGO_URI)
+  .connect(MONGO_URI, {
+    dbName: "FullStackProject",
+  })
   .then(() => {
     console.log("MongoDB Connected");
   })
@@ -31,7 +35,6 @@ app.get("/", (req, res) => {
 
 // Mount Routes
 app.use("/api/weather", weatherRoutes);
-app.use("/api/products", productRoutes);
 
 // Server Configuration
 const PORT = process.env.PORT || 5000;
