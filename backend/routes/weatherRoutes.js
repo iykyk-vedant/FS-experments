@@ -2,66 +2,35 @@ const express = require("express");
 const router = express.Router();
 const Weather = require("../models/Weather");
 
-// 1. CREATE WEATHER
 router.post("/", async (req, res) => {
-  try {
-    const weather = await Weather.create(req.body);
-    res.status(201).json(weather);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
+  try { res.status(201).json(await Weather.create(req.body)); }
+  catch (e) { res.status(400).json({ message: e.message }); }
 });
 
-// 2. GET ALL WEATHERS
 router.get("/", async (req, res) => {
-  try {
-    const weathers = await Weather.find();
-    res.status(200).json(weathers);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+  try { res.json(await Weather.find()); }
+  catch (e) { res.status(500).json({ message: e.message }); }
 });
 
-// 3. GET WEATHER BY ID
 router.get("/:id", async (req, res) => {
   try {
-    const weather = await Weather.findById(req.params.id);
-    if (!weather) {
-      return res.status(404).json({ message: "Weather record not found" });
-    }
-    res.status(200).json(weather);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+    const w = await Weather.findById(req.params.id);
+    w ? res.json(w) : res.status(404).json({ message: "Weather record not found" });
+  } catch (e) { res.status(500).json({ message: e.message }); }
 });
 
-// 4. UPDATE WEATHER
 router.put("/:id", async (req, res) => {
   try {
-    const weather = await Weather.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true
-    });
-    if (!weather) {
-      return res.status(404).json({ message: "Weather record not found" });
-    }
-    res.status(200).json(weather);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
+    const w = await Weather.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    w ? res.json(w) : res.status(404).json({ message: "Weather record not found" });
+  } catch (e) { res.status(400).json({ message: e.message }); }
 });
 
-// 5. DELETE WEATHER
 router.delete("/:id", async (req, res) => {
   try {
-    const weather = await Weather.findByIdAndDelete(req.params.id);
-    if (!weather) {
-      return res.status(404).json({ message: "Weather record not found" });
-    }
-    res.status(200).json({ message: "Weather record deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+    const w = await Weather.findByIdAndDelete(req.params.id);
+    w ? res.json({ message: "Weather record deleted successfully" }) : res.status(404).json({ message: "Weather record not found" });
+  } catch (e) { res.status(500).json({ message: e.message }); }
 });
 
 module.exports = router;
