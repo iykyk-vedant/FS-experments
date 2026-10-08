@@ -1,17 +1,21 @@
 const express = require("express");
-const { body } = require("express-validator");
-const { registerUser, loginUser, getProfile } = require("../controllers/userController");
-const protect = require("../middleware/authMiddleware");
+const { protect, authorize } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-router.post("/register", [
-  body("name").notEmpty().withMessage("Name is required"),
-  body("email").isEmail().withMessage("Enter valid email"),
-  body("password").isLength({ min: 6 }).withMessage("Password must contain at least 6 characters")
-], registerUser);
+// USER + ADMIN (Protected Dashboard)
+router.get("/dashboard", protect, (req, res) => {
+  res.json({ message: "Welcome to the protected dashboard", user: req.user });
+});
 
-router.post("/login", loginUser);
-router.get("/profile", protect, getProfile);
+// ADMIN ONLY (Protected Admin Route)
+router.get("/admin", protect, authorize("admin"), (req, res) => {
+  res.json({ message: "Welcome Admin! You can access this page." });
+});
+
+// Profile route
+router.get("/profile", protect, (req, res) => {
+  res.json({ message: "User profile", user: req.user });
+});
 
 module.exports = router;

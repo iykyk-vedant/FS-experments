@@ -19,8 +19,10 @@ mongoose.connect(MONGO_URI, { dbName: "FullStackProject" })
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.error("MongoDB Connection Error:", err));
 
-// Routes & Centralized Error Handler
-app.get("/", (req, res) => res.json({ message: "Secure REST API is running" }));
+// Routes
+app.get("/", (req, res) => res.json({ message: "JWT Authentication & RBAC API is running" }));
+app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/user", require("./routes/userRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/weather", require("./routes/weatherRoutes"));
 app.use(require("./middleware/errorMiddleware"));
