@@ -48,7 +48,7 @@ async function runTests() {
   console.log("==================================================\n");
 
   const ts = Date.now();
-  const userEmail = `pooja_${ts}@gmail.com`;
+  const userEmail = `vedant_${ts}@gmail.com`;
   const adminEmail = `admin_${ts}@gmail.com`;
   let userToken = "";
   let adminToken = "";
@@ -57,7 +57,7 @@ async function runTests() {
     // 1. Register User (role: 'user')
     console.log("🔹 1. Register User with role: 'user'");
     const regUserRes = await request("POST", "/api/auth/register", {
-      name: "Pooja",
+      name: "Vedant",
       email: userEmail,
       password: "password123",
       role: "user"
