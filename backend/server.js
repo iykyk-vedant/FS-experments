@@ -23,6 +23,7 @@ mongoose.connect(MONGO_URI, { dbName: "FullStackProject" })
 // Routes
 app.get("/", (req, res) => res.json({ message: "JWT Authentication & RBAC API is running" }));
 app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/users", require("./routes/authRoutes"));
 app.use("/api/user", require("./routes/userRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/weather", require("./routes/weatherRoutes"));
