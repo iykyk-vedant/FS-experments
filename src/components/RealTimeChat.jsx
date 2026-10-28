@@ -1,16 +1,25 @@
 import React, { useState, useEffect, useRef } from "react";
 import { io } from "socket.io-client";
+import { useAppContext } from "../context/AppContext";
 
 /**
  * RealTimeChat Component: Experiment 8 - Enable real-time communication via WebSockets
  */
 export function RealTimeChat() {
-  const [username, setUsername] = useState("Student 1");
+  const { user } = useAppContext();
+  const [username, setUsername] = useState(user?.name || "Student 1");
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [connected, setConnected] = useState(false);
   const socketRef = useRef(null);
   const messagesEndRef = useRef(null);
+
+  // Sync username when logged-in user changes
+  useEffect(() => {
+    if (user?.name) {
+      setUsername(user.name);
+    }
+  }, [user]);
 
   useEffect(() => {
     // Connect to WebSocket server on backend (port 5000)

@@ -3,10 +3,78 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 export const AppContext = createContext();
 
 const API_BASE = 'http://127.0.0.1:5000/api/weather';
+const AUTH_BASE = 'http://127.0.0.1:5000/api/auth';
 
 export function AppProvider({ children }) {
   const [favorites, setFavorites] = useState([]);
   const [backendConnected, setBackendConnected] = useState(false);
+
+  // Authentication State
+  const [user, setUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('fs_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const [token, setToken] = useState(() => {
+    return localStorage.getItem('fs_token') || null;
+  });
+
+  // Login handler connecting to backend /api/auth/login
+  const login = async (email, password) => {
+    try {
+      const res = await fetch(`${AUTH_BASE}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        return { success: false, message: data.message || 'Login failed' };
+      }
+
+      setUser(data.user);
+      setToken(data.token);
+      localStorage.setItem('fs_token', data.token);
+      localStorage.setItem('fs_user', JSON.stringify(data.user));
+
+      return { success: true, user: data.user, token: data.token };
+    } catch (err) {
+      return { success: false, message: 'Server connection failed. Is backend running?' };
+    }
+  };
+
+  // Register handler connecting to backend /api/auth/register
+  const register = async ({ name, email, password, role = 'user' }) => {
+    try {
+      const res = await fetch(`${AUTH_BASE}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password, role })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        return { success: false, message: data.message || 'Registration failed' };
+      }
+
+      return { success: true, message: data.message };
+    } catch (err) {
+      return { success: false, message: 'Server connection failed. Is backend running?' };
+    }
+  };
+
+  // Logout handler
+  const logout = () => {
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem('fs_token');
+    localStorage.removeItem('fs_user');
+  };
 
   // Fetch initial favorites from MongoDB API on mount
   useEffect(() => {
@@ -35,7 +103,6 @@ export function AppProvider({ children }) {
   }, []);
 
   const addFavorite = async (city) => {
-    // Check if already in favorites list
     if (favorites.some((item) => item.name.toLowerCase() === city.name.toLowerCase())) {
       return;
     }
@@ -76,7 +143,6 @@ export function AppProvider({ children }) {
       console.warn('Could not persist to MongoDB, saving in memory:', e.message);
     }
 
-    // Fallback to local ID if backend is unavailable
     setFavorites((prev) => [...prev, { id: String(Date.now()), ...city }]);
   };
 
@@ -93,7 +159,19 @@ export function AppProvider({ children }) {
   };
 
   return (
-    <AppContext.Provider value={{ favorites, addFavorite, removeFavorite, backendConnected }}>
+    <AppContext.Provider
+      value={{
+        favorites,
+        addFavorite,
+        removeFavorite,
+        backendConnected,
+        user,
+        token,
+        login,
+        register,
+        logout
+      }}
+    >
       {children}
     </AppContext.Provider>
   );

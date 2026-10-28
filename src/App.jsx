@@ -5,16 +5,14 @@ import { Login } from './components/Login';
 import { Dashboard } from './components/Dashboard';
 import { Favorites } from './components/Favorites';
 import { RealTimeChat } from './components/RealTimeChat';
+import { AdminPanel } from './components/AdminPanel';
 import { useWeather, WeatherContext } from './hooks/useWeather';
 
 /**
- * Main App: Full-Stack WeatherCast with Real-Time WebSockets Communication (Exp 8)
+ * Main App: Full-Stack WeatherCast with JWT RBAC Auth & WebSockets
  */
 export default function App() {
-  // Navigation state between pages
   const [activeTab, setActiveTab] = useState('home');
-
-  // Weather custom hook state
   const weatherProps = useWeather('Mumbai');
 
   return (
@@ -50,11 +48,15 @@ export default function App() {
             {activeTab === 'chat' && (
               <RealTimeChat />
             )}
+
+            {activeTab === 'admin' && (
+              <AdminPanel />
+            )}
           </main>
 
           {/* Footer */}
           <footer className="py-4 text-center text-xs text-slate-500 border-t border-slate-900 mt-8">
-            WeatherCast Application • Real-Time WebSockets with Socket.IO
+            WeatherCast Application • Full-Stack with JWT RBAC & WebSockets
           </footer>
         </div>
       </div>
