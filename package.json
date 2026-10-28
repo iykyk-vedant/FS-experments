@@ -30,6 +30,7 @@
   "homepage": "https://github.com/iykyk-vedant/FS-experments#readme",
   "dependencies": {
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "socket.io-client": "^4.8.4"
   }
 }

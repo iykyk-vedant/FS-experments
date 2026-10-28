@@ -4,10 +4,11 @@ import { Home } from './components/Home';
 import { Login } from './components/Login';
 import { Dashboard } from './components/Dashboard';
 import { Favorites } from './components/Favorites';
+import { RealTimeChat } from './components/RealTimeChat';
 import { useWeather, WeatherContext } from './hooks/useWeather';
 
 /**
- * Main App: Experiment 2 + Experiment 3 (React Hooks & Context API Global State)
+ * Main App: Full-Stack WeatherCast with Real-Time WebSockets Communication (Exp 8)
  */
 export default function App() {
   // Navigation state between pages
@@ -24,7 +25,7 @@ export default function App() {
           <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
 
           {/* Dynamic Page Views */}
-          <main className="flex-1">
+          <main className="flex-1 mt-6">
             {activeTab === 'home' && (
               <Home setActiveTab={setActiveTab} />
             )}
@@ -45,11 +46,15 @@ export default function App() {
                 }}
               />
             )}
+
+            {activeTab === 'chat' && (
+              <RealTimeChat />
+            )}
           </main>
 
           {/* Footer */}
           <footer className="py-4 text-center text-xs text-slate-500 border-t border-slate-900 mt-8">
-            Weather Dashboard • Built with React 19 & Tailwind CSS
+            WeatherCast Application • Real-Time WebSockets with Socket.IO
           </footer>
         </div>
       </div>

@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { AppContext } from '../context/AppContext';
 
 /**
- * Navbar Component: Navigation between Home, Dashboard, Favorites, and Login
+ * Navbar Component: Navigation between Home, Dashboard, Favorites, Live Chat, and Login
  */
 export function Navbar({ activeTab, setActiveTab }) {
   const { favorites } = useContext(AppContext);
@@ -11,6 +11,7 @@ export function Navbar({ activeTab, setActiveTab }) {
     { id: 'home', label: '🏠 Home' },
     { id: 'dashboard', label: '📊 Dashboard' },
     { id: 'favorites', label: `⭐ Favorites (${favorites.length})` },
+    { id: 'chat', label: '💬 Live Chat' },
     { id: 'login', label: '🔐 Login' }
   ];
 
