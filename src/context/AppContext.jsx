@@ -1,9 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
+import { API_WEATHER as API_BASE, API_AUTH as AUTH_BASE } from '../config';
 
 export const AppContext = createContext();
-
-const API_BASE = 'http://127.0.0.1:5000/api/weather';
-const AUTH_BASE = 'http://127.0.0.1:5000/api/auth';
 
 export function AppProvider({ children }) {
   const [favorites, setFavorites] = useState([]);

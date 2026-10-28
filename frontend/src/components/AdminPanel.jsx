@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
+import { API_USER } from '../config';
 
 export function AdminPanel() {
   const { token, user } = useAppContext();
@@ -9,7 +10,7 @@ export function AdminPanel() {
   useEffect(() => {
     async function verifyAdmin() {
       try {
-        const res = await fetch('http://127.0.0.1:5000/api/user/admin', {
+        const res = await fetch(`${API_USER}/admin`, {
           headers: {
             Authorization: `Bearer ${token}`
           }

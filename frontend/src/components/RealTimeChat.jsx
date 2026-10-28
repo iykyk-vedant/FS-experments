@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 import { useAppContext } from "../context/AppContext";
+import { BACKEND_URL } from "../config";
 
 /**
  * RealTimeChat Component: Experiment 8 - Enable real-time communication via WebSockets
@@ -22,8 +23,8 @@ export function RealTimeChat() {
   }, [user]);
 
   useEffect(() => {
-    // Connect to WebSocket server on backend (port 5000)
-    const socket = io("http://localhost:5000");
+    // Connect to WebSocket server on backend
+    const socket = io(BACKEND_URL);
     socketRef.current = socket;
 
     socket.on("connect", () => {
