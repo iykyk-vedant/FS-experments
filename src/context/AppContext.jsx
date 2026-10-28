@@ -68,19 +68,31 @@ export function AppProvider({ children }) {
     }
   };
 
-  // Logout handler
+  // Logout handler: clears token, user, and wipes cached favorites immediately
   const logout = () => {
     setUser(null);
     setToken(null);
+    setFavorites([]);
     localStorage.removeItem('fs_token');
     localStorage.removeItem('fs_user');
   };
 
-  // Fetch initial favorites from MongoDB API on mount
+  // Sync Favorites per User: Load user-specific favorites whenever authenticated user changes
   useEffect(() => {
-    async function loadFavorites() {
+    if (!user || !token) {
+      // User is logged out -> clear favorites
+      setFavorites([]);
+      return;
+    }
+
+    async function loadUserFavorites() {
       try {
-        const res = await fetch(API_BASE);
+        const res = await fetch(API_BASE, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
         if (res.ok) {
           const data = await res.json();
           const mapped = data.map((item) => ({
@@ -94,17 +106,21 @@ export function AppProvider({ children }) {
           setBackendConnected(true);
         }
       } catch (err) {
-        console.warn('Backend API not reachable, using local state:', err.message);
+        console.warn('Backend API unreachable:', err.message);
         setBackendConnected(false);
       }
     }
 
-    loadFavorites();
-  }, []);
+    loadUserFavorites();
+  }, [user, token]);
 
   const addFavorite = async (city) => {
+    if (!user || !token) {
+      return { success: false, requireLogin: true };
+    }
+
     if (favorites.some((item) => item.name.toLowerCase() === city.name.toLowerCase())) {
-      return;
+      return { success: true, alreadyExists: true };
     }
 
     try {
@@ -120,7 +136,10 @@ export function AppProvider({ children }) {
 
       const res = await fetch(API_BASE, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
         body: JSON.stringify(payload)
       });
 
@@ -137,22 +156,30 @@ export function AppProvider({ children }) {
           }
         ]);
         setBackendConnected(true);
-        return;
+        return { success: true };
       }
     } catch (e) {
-      console.warn('Could not persist to MongoDB, saving in memory:', e.message);
+      console.warn('Could not persist to MongoDB:', e.message);
     }
 
     setFavorites((prev) => [...prev, { id: String(Date.now()), ...city }]);
+    return { success: true };
   };
 
   const removeFavorite = async (id) => {
+    if (!token) return;
+
     try {
       if (id && id.length === 24) {
-        await fetch(`${API_BASE}/${id}`, { method: 'DELETE' });
+        await fetch(`${API_BASE}/${id}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
       }
     } catch (e) {
-      console.warn('Could not delete from MongoDB, removing from local state:', e.message);
+      console.warn('Could not delete from MongoDB:', e.message);
     }
 
     setFavorites((prev) => prev.filter((item) => item.id !== id));

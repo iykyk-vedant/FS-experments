@@ -4,14 +4,15 @@ import { AppContext } from '../context/AppContext';
 
 /**
  * Dashboard Component: Search form, unit toggle, and weather forecast display
- * Consumes global weather state via useWeatherContext() (useContext hook)
- * Consumes global favorites state & actions via AppContext
+ * Consumes global weather state via useWeatherContext()
+ * Consumes user-specific favorites state & actions via AppContext
  */
 export function Dashboard() {
   const { weather, forecast, cityInfo, loading, error, fetchWeather } = useWeatherContext();
-  const { favorites, addFavorite, removeFavorite } = useContext(AppContext);
+  const { favorites, addFavorite, removeFavorite, user } = useContext(AppContext);
   const [searchInput, setSearchInput] = useState('');
   const [unit, setUnit] = useState('C');
+  const [authNotice, setAuthNotice] = useState('');
 
   const isFav = favorites.some((f) => f.name.toLowerCase() === cityInfo.name?.toLowerCase());
 
@@ -25,10 +26,37 @@ export function Dashboard() {
     }
   };
 
+  const handleFavoriteClick = async () => {
+    if (!user) {
+      setAuthNotice('⚠️ Please sign in to save cities to your favorites!');
+      setTimeout(() => setAuthNotice(''), 3500);
+      return;
+    }
+
+    if (isFav) {
+      const favItem = favorites.find((f) => f.name.toLowerCase() === cityInfo.name.toLowerCase());
+      if (favItem) removeFavorite(favItem.id);
+    } else {
+      await addFavorite({
+        name: cityInfo.name,
+        country: cityInfo.country,
+        temp: weather.temperature,
+        condition: weather.condition
+      });
+    }
+  };
+
   const toUnit = (celsius) => (unit === 'F' ? Math.round((celsius * 9) / 5 + 32) : celsius);
 
   return (
     <div className="flex flex-col gap-6 py-4">
+      {/* Auth Notice Toast */}
+      {authNotice && (
+        <div className="p-3 bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-semibold rounded-xl text-center animate-pulse">
+          {authNotice}
+        </div>
+      )}
+
       {/* Search Bar & Controls */}
       <div className="bg-slate-800/80 p-5 rounded-2xl border border-slate-700 shadow-md">
         <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3">
@@ -106,16 +134,7 @@ export function Dashboard() {
                     📍 {cityInfo.country || 'Location'}
                   </span>
                   <button
-                    onClick={() =>
-                      isFav
-                        ? removeFavorite(favorites.find((f) => f.name.toLowerCase() === cityInfo.name.toLowerCase())?.id)
-                        : addFavorite({
-                            name: cityInfo.name,
-                            country: cityInfo.country,
-                            temp: weather.temperature,
-                            condition: weather.condition
-                          })
-                    }
+                    onClick={handleFavoriteClick}
                     className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer border ${
                       isFav
                         ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30'

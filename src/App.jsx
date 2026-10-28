@@ -38,6 +38,7 @@ export default function App() {
 
             {activeTab === 'favorites' && (
               <Favorites
+                setActiveTab={setActiveTab}
                 onSelectCity={(city) => {
                   weatherProps.fetchWeather(city);
                   setActiveTab('dashboard');
